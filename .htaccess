@@ -1,0 +1,9 @@
+# Redirect root to login if not authenticated
+# This is optional - you can remove this if you want
+
+# Enable rewrite engine
+RewriteEngine On
+
+# If accessing root and not logged in, redirect to login
+# Note: This requires mod_rewrite to be enabled in Apache
+

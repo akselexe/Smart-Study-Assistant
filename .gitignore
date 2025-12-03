@@ -1,0 +1,23 @@
+# Dependencies
+/vendor/
+composer.lock
+
+# Configuration (contains sensitive data)
+/config/config.php
+
+# Setup script (should be deleted after use)
+/setup.php
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
