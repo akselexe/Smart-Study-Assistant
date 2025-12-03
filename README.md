@@ -85,12 +85,6 @@ If you prefer to avoid CLI issues, run `setup.php` from your browser (it uses th
 - Do not commit `config/config.php` with real credentials to version control.
 - Consider adding CSRF protection and stricter input validation for production.
 
-## Next steps / recommended improvements
-
-- Add a quiz listing and management UI for professors.
-- Add per-question feedback and review pages for professors.
-- Implement rate-limiting and API usage metrics.
-
 ## License
 
 This project is for educational purposes.
