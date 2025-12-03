@@ -9,97 +9,87 @@ A web-based study assistant chatbot application built with PHP, MySQL, and Groq 
 - 📚 Subject categorization (Mathematics, Science, History, Programming, General)
 - 💾 Chat history storage in MySQL database
 - 🎨 Modern, responsive UI design
-- 🔄 Session management
+- � Role-based access (students / professors)
 
-## Requirements
+## Quick setup
 
-- XAMPP (Apache + MySQL + PHP)
-- PHP 7.4 or higher
-- Composer (for PHP dependencies)
-- Groq API key (get one at https://console.groq.com/keys)
+1. Place the project in your webroot (example for XAMPP):
+   `C:\xampp_lite_8_4\www\prog_project`
 
-## Installation
-
-1. **Clone or download this project** to your XAMPP `htdocs` folder:
-   ```
-   C:\xampp_lite_8_4\www\prog_project
-   ```
-
-2. **Install PHP dependencies** using Composer:
-   ```bash
+2. Install PHP dependencies (optional):
+   ```powershell
    composer install
    ```
-   If you don't have Composer, download it from https://getcomposer.org/
 
-3. **Configure the application**:
-   - Open `config/config.php`
-   - Replace `'your_groq_api_key_here'` with your actual Groq API key
+3. Configure the application:
+   - Copy `config/config.php.example` (if present) to `config/config.php` and set DB credentials and your Groq API key.
 
-4. **Set up the database**:
-   - Open your browser and go to: `http://localhost/prog_project/setup.php`
-   - This will automatically create the database and tables
-   - After setup completes, you can delete `setup.php` for security
+4. Initialize the database (one of the following):
+   - Open in browser: `http://localhost/prog_project/setup.php` (recommended; uses the web server's PHP configuration)
+   - Or run the setup/migration script via CLI (only if your CLI PHP has mysqli enabled):
+     ```powershell
+     php .\migrate_create_quiz_tables.php  # if present
+     ```
+     Note: the project provides `setup.php` for automatic initialization — prefer using the browser-based setup if unsure.
 
-5. **Access the application**:
-   - Open: `http://localhost/prog_project/index.php`
+5. Open the app:
+   - Students: `http://localhost/prog_project/index.php`
+   - Professors: `http://localhost/prog_project/professor/dashboard.php`
 
-## Project Structure
+## Important behavior: professor access
+
+- Professors do not access the chat UI. If a logged-in user is a professor, `index.php` redirects them to the professor dashboard. This prevents professors from opening the chat interface directly.
+- Professors still manage exercises and quizzes from the `professor/` area.
+
+## Project structure (key files)
 
 ```
 prog_project/
-├── api/
-│   └── chat.php              # Backend API endpoint for Groq integration
-├── assets/
-│   ├── css/
-│   │   └── style.css         # Styling
-│   └── js/
-│       └── chat.js           # Frontend JavaScript
-├── config/
-│   ├── config.php            # Configuration (API keys, DB settings)
-│   └── db.php                # Database connection class
-├── vendor/                   # Composer dependencies
-├── index.php                 # Main chat interface
-├── setup.php                 # Database setup script
-├── composer.json             # PHP dependencies
-└── README.md                 # This file
+├── api/                     # API endpoints (e.g. chat.php)
+├── assets/                  # CSS and JS
+├── config/                  # app configuration and DB wrapper
+├── includes/                # shared UI fragments
+├── professor/               # professor pages (create exercise, dashboard)
+├── student/                 # student pages (exercises, view exercise)
+├── uploads/                 # uploaded exercise files
+├── index.php                # Main chat interface (students)
+├── login.php, register.php  # auth pages
+└── README.md
 ```
-
-## Database Schema
-
-The application uses the following tables:
-
-- **users**: User accounts (for future authentication)
-- **chat_sessions**: Chat session tracking
-- **chat_messages**: Stores all chat messages
-- **subjects**: Predefined subject categories
-
-## Usage
-
-1. Select a subject from the dropdown (optional)
-2. Type your question in the input field
-3. Click "Send" or press Enter
-4. The AI assistant will respond based on your question
-5. Use "Clear Chat" to remove messages from the current view
-6. Use "New Session" to start a fresh conversation
 
 ## Configuration
 
 Edit `config/config.php` to customize:
-- Database credentials (if different from XAMPP defaults)
+- Database credentials (DB_HOST, DB_USER, DB_PASS, DB_NAME)
 - Groq API key
-- Application settings
 
-## Security Notes
+## Common troubleshooting
 
-- **Delete `setup.php`** after initial database setup
-- **Never commit** your `config/config.php` with real API keys to version control
-- Consider adding authentication for production use
+- API Key problems: ensure GROQ API key is set in `config/config.php`.
+- Database connection: verify MySQL is running and credentials are correct.
+- Composer: run `composer install` in the project root to install optional dependencies.
 
-## Troubleshooting
+CLI PHP and mysqli
 
-- **API Key Error**: Make sure you've set your Groq API key in `config/config.php`
-- **Database Connection Error**: Check that MySQL is running in XAMPP
-- **Composer Error**: Make sure Composer is installed and run `composer install` in the project directory
+- If you run PHP scripts from PowerShell/CLI (for migrations), you may see an error like "Class 'mysqli' not found". This means the CLI `php` binary is using a php.ini where `mysqli` is not enabled.
+- To fix:
+  1. Run `php --ini` to find the loaded `php.ini` used by the CLI.
+ 2. Edit that `php.ini` and enable the `mysqli` extension (remove the leading `;` from `extension=php_mysqli.dll` on Windows).
+ 3. Restart your terminal and run `php -m` — `mysqli` should appear in the list.
+
+If you prefer to avoid CLI issues, run `setup.php` from your browser (it uses the webserver's PHP configuration which is typically already configured with `mysqli`).
+
+## Security notes
+
+- Delete or secure any setup/migration scripts after initial use (e.g., `setup.php`, `migrate_*.php`).
+- Do not commit `config/config.php` with real credentials to version control.
+- Consider adding CSRF protection and stricter input validation for production.
+
+## Next steps / recommended improvements
+
+- Add a quiz listing and management UI for professors.
+- Add per-question feedback and review pages for professors.
+- Implement rate-limiting and API usage metrics.
 
 ## License
 
