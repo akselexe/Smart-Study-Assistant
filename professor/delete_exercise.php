@@ -35,10 +35,11 @@ $stmt = $db->prepare("DELETE FROM exercises WHERE id = ? AND professor_id = ?");
 $stmt->bind_param("ii", $exerciseId, $professorId);
 
 if ($stmt->execute()) {
-    header('Location: dashboard.php?success=' . urlencode('Exercise deleted successfully'));
+    $redirect = 'dashboard.php?success=' . urlencode('Exercise deleted successfully');
 } else {
-    header('Location: dashboard.php?error=' . urlencode('Failed to delete exercise'));
+    $redirect = 'dashboard.php?error=' . urlencode('Failed to delete exercise');
 }
+
+$db->close();
+header('Location: ' . $redirect);
 exit;
-?>
-<?php $db->close(); ?>
