@@ -13,11 +13,11 @@ if (!$auth->isLoggedIn()) {
     exit;
 }
 
-// Check if API key is set
-if (GROQ_API_KEY === 'your_groq_api_key_here') {
+// Check if API key is set (do not reveal the key in responses)
+if (empty(GROQ_API_KEY) || GROQ_API_KEY === 'your_groq_api_key_here') {
     echo json_encode([
         'success' => false,
-        'error' => 'Please set your Groq API key in config/config.php'
+        'error' => 'Groq API key is not configured. Set the GROQ_API_KEY environment variable or update config/config.php (avoid committing secrets).'
     ]);
     exit;
 }
