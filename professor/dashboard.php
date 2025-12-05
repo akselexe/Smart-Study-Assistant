@@ -7,16 +7,13 @@ $db = new Database();
 $professorId = $auth->getUserId();
 $username = $auth->getUsername();
 
-// Handle success/error messages
 $success = $_GET['success'] ?? '';
 $error = $_GET['error'] ?? '';
 
-// Handle filtering
 $filterSubject = $_GET['subject'] ?? '';
 $filterCourse = $_GET['course'] ?? '';
 $filterTopic = $_GET['topic'] ?? '';
 
-// Build query
 $query = "SELECT * FROM exercises WHERE professor_id = ?";
 $params = [$professorId];
 $types = "i";

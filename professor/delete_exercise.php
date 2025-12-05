@@ -24,8 +24,6 @@ if ($result->num_rows === 0) {
 }
 
 $exercise = $result->fetch_assoc();
-
-// Delete file if exists
 if (!empty($exercise['file_path'])) {
     $filePath = __DIR__ . '/../' . $exercise['file_path'];
     if (file_exists($filePath)) {
@@ -33,7 +31,6 @@ if (!empty($exercise['file_path'])) {
     }
 }
 
-// Delete exercise from database
 $stmt = $db->prepare("DELETE FROM exercises WHERE id = ? AND professor_id = ?");
 $stmt->bind_param("ii", $exerciseId, $professorId);
 

@@ -5,13 +5,11 @@ $auth = new Auth();
 $error = '';
 $success = '';
 
-// If already logged in, redirect to index
 if ($auth->isLoggedIn()) {
     header('Location: index.php');
     exit;
 }
 
-// Handle registration form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username'] ?? '');
     $email = trim($_POST['email'] ?? '');
@@ -19,12 +17,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $confirmPassword = $_POST['confirm_password'] ?? '';
     $role = $_POST['role'] ?? 'student';
 
-    // Validate role
     if (!in_array($role, ['student', 'professor'])) {
         $role = 'student';
     }
-
-    // Validate passwords match
     if ($password !== $confirmPassword) {
         $error = 'Passwords do not match';
     } else {
@@ -32,10 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($result['success']) {
             $success = $result['message'];
-            // Optionally auto-login after registration
-            // $auth->login($username, $password);
-            // header('Location: index.php');
-            // exit;
+            
         } else {
             $error = $result['error'];
         }

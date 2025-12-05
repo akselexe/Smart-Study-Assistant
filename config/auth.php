@@ -81,7 +81,7 @@ class Auth {
 
         // Verify password
         if (password_verify($password, $user['password'])) {
-            // Session is already started in constructor
+            
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
             $_SESSION['email'] = $user['email'];
@@ -95,24 +95,24 @@ class Auth {
     }
 
     public function logout() {
-        // Session is already started in constructor
+        
         session_unset();
         session_destroy();
         return ['success' => true, 'message' => 'Logged out successfully'];
     }
 
     public function isLoggedIn() {
-        // Session is already started in constructor
+        
         return isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
     }
 
     public function getUserId() {
-        // Session is already started in constructor
+        
         return $_SESSION['user_id'] ?? null;
     }
 
     public function getUsername() {
-        // Session is already started in constructor
+        
         return $_SESSION['username'] ?? null;
     }
 
@@ -124,7 +124,7 @@ class Auth {
     }
 
     public function getUserRole() {
-        // Session is already started in constructor
+        
         return $_SESSION['role'] ?? 'student';
     }
 

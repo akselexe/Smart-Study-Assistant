@@ -16,7 +16,6 @@ $sessionId = $_GET['session_id'] ?? null;
 
 try {
     if (empty($sessionId)) {
-        // pick the most recent session for the user
         $stmt = $db->prepare("SELECT session_id FROM chat_sessions WHERE user_id = ? ORDER BY updated_at DESC LIMIT 1");
         $stmt->bind_param("i", $userId);
         $stmt->execute();
@@ -47,7 +46,6 @@ try {
         exit;
     }
 
-    // Fetch messages
     $stmt = $db->prepare("SELECT role, message, created_at FROM chat_messages WHERE session_id = ? ORDER BY created_at ASC LIMIT 500");
     $stmt->bind_param("s", $sessionId);
     $stmt->execute();

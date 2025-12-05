@@ -15,7 +15,6 @@ $username = $auth->getUsername();
 $userRole = $auth->getUserRole();
 $exerciseId = $_GET['exercise_id'] ?? null;
 
-// Load exercise context if provided
 $exerciseContext = null;
 if ($exerciseId) {
     require_once 'config/db.php';
@@ -108,7 +107,6 @@ if ($exerciseId) {
     <script src="assets/js/chat.js"></script>
     <?php if ($exerciseContext): ?>
     <script>
-        // Store exercise context for chat
         window.exerciseContext = {
             id: <?php echo $exerciseId; ?>,
             title: <?php echo json_encode($exerciseContext['title']); ?>,

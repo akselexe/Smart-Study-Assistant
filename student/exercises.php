@@ -6,13 +6,13 @@ $auth = requireStudent();
 $db = new Database();
 $username = $auth->getUsername();
 
-// Handle filtering and search
 $filterSubject = $_GET['subject'] ?? '';
 $filterCourse = $_GET['course'] ?? '';
 $filterTopic = $_GET['topic'] ?? '';
 $search = trim($_GET['search'] ?? '');
 
 // Build query
+// (filters are applied below)
 $query = "SELECT e.*, u.username as professor_name FROM exercises e 
           LEFT JOIN users u ON e.professor_id = u.id 
           WHERE 1=1";
@@ -56,7 +56,6 @@ $stmt->execute();
 $result = $stmt->get_result();
 $exercises = $result->fetch_all(MYSQLI_ASSOC);
 
-// Get unique subjects, courses, and topics for filters
 $stmt = $db->query("SELECT DISTINCT subject, course, topic FROM exercises");
 $subjects = [];
 $courses = [];

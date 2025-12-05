@@ -12,7 +12,6 @@ $exerciseId = $_GET['id'] ?? null;
 $error = '';
 $success = '';
 
-// Load exercise if editing
 if ($exerciseId) {
     $stmt = $db->prepare("SELECT * FROM exercises WHERE id = ? AND professor_id = ?");
     $stmt->bind_param("ii", $exerciseId, $professorId);
@@ -25,7 +24,6 @@ if ($exerciseId) {
     $exercise = $result->fetch_assoc();
 }
 
-// Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = trim($_POST['title'] ?? '');
     $description = trim($_POST['description'] ?? '');
@@ -34,14 +32,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $topic = trim($_POST['topic'] ?? '');
     $content = trim($_POST['content'] ?? '');
 
-    // Validation
     if (empty($title) || empty($subject)) {
         $error = 'Title and Subject are required';
     } else {
         $filePath = null;
         $fileName = null;
-
-        // Handle file upload
         if (isset($_FILES['exercise_file']) && $_FILES['exercise_file']['error'] === UPLOAD_ERR_OK) {
             $file = $_FILES['exercise_file'];
             $allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/gif', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
@@ -76,7 +71,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (empty($error)) {
             if ($exerciseId) {
-                // Update existing exercise
                 if ($filePath) {
                     // Delete old file if exists
                     if (!empty($exercise['file_path'])) {
@@ -92,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $stmt->bind_param("ssssssii", $title, $description, $subject, $course, $topic, $content, $exerciseId, $professorId);
                 }
             } else {
-                // Create new exercise
+                
                 if ($filePath) {
                     $stmt = $db->prepare("INSERT INTO exercises (professor_id, title, description, subject, course, topic, content, file_path, file_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
                     $stmt->bind_param("issssssss", $professorId, $title, $description, $subject, $course, $topic, $content, $filePath, $fileName);

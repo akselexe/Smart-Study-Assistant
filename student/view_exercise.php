@@ -12,7 +12,6 @@ if (!$exerciseId) {
     exit;
 }
 
-// Get exercise details
 $stmt = $db->prepare("SELECT e.*, u.username as professor_name FROM exercises e 
                       LEFT JOIN users u ON e.professor_id = u.id 
                       WHERE e.id = ?");

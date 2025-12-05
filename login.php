@@ -5,18 +5,16 @@ $auth = new Auth();
 $error = '';
 $success = '';
 
-// Check for logout message
 if (isset($_GET['logged_out'])) {
     $success = 'You have been logged out successfully.';
 }
 
-// If already logged in, redirect to index
+
 if ($auth->isLoggedIn()) {
     header('Location: index.php');
     exit;
 }
 
-// Handle login form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
