@@ -12,7 +12,7 @@ if (!$exerciseId) {
     exit;
 }
 
-// Verify exercise belongs to professor
+
 $stmt = $db->prepare("SELECT * FROM exercises WHERE id = ? AND professor_id = ?");
 $stmt->bind_param("ii", $exerciseId, $professorId);
 $stmt->execute();
