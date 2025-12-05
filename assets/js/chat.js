@@ -87,13 +87,83 @@ class ChatApp {
         contentDiv.className = 'message-content';
         
         const roleLabel = role === 'user' ? 'You' : 'Assistant';
-        contentDiv.innerHTML = `<strong>${roleLabel}:</strong> ${this.escapeHtml(content)}`;
+        if (role === 'assistant') {
+            // Render assistant content using a safe third-party renderer (marked) + DOMPurify.
+            // We strip triple-backtick fences (```) and all '*' characters per request before parsing.
+            contentDiv.innerHTML = `<strong>${roleLabel}:</strong> <div class="assistant-content">Rendering...</div>`;
+            // Append before async rendering so DOM position is set
+            messageDiv.appendChild(contentDiv);
+            this.chatMessages.appendChild(messageDiv);
+            this.renderAssistantMessage(content, contentDiv.querySelector('.assistant-content'));
+            return; // already appended
+        } else {
+            // Keep user content escaped/plain
+            contentDiv.innerHTML = `<strong>${roleLabel}:</strong> ${this.escapeHtml(content)}`;
+        }
         
         messageDiv.appendChild(contentDiv);
         this.chatMessages.appendChild(messageDiv);
         
         // Scroll to bottom
         this.scrollToBottom();
+    }
+
+    // Render assistant message using marked + DOMPurify loaded from CDN.
+    async renderAssistantMessage(content, container) {
+        try {
+            await this.ensureMarkdownLibs();
+
+            // Per request: remove triple-backtick fences and all '*' characters before parsing
+            let md = String(content || '');
+            // Remove only the ``` fence markers (keep inner content)
+            md = md.replace(/```/g, '');
+            // Remove all asterisks
+            md = md.replace(/\*/g, '');
+
+            // Parse to HTML with marked (if available) otherwise escape
+            let html;
+            if (window.marked && typeof window.marked.parse === 'function') {
+                html = window.marked.parse(md);
+            } else {
+                html = this.escapeHtml(md).replace(/\r?\n/g, '<br>');
+            }
+
+            // Sanitize with DOMPurify if available
+            if (window.DOMPurify && typeof window.DOMPurify.sanitize === 'function') {
+                container.innerHTML = window.DOMPurify.sanitize(html);
+            } else {
+                container.innerHTML = html;
+            }
+            this.scrollToBottom();
+        } catch (err) {
+            // Fallback: show escaped plain text
+            container.textContent = String(content);
+            this.scrollToBottom();
+        }
+    }
+
+    // Ensure marked + DOMPurify are loaded; loads from CDN if missing.
+    ensureMarkdownLibs() {
+        if (window.marked && window.DOMPurify) return Promise.resolve();
+
+        const loadScript = (url) => new Promise((resolve, reject) => {
+            const s = document.createElement('script');
+            s.src = url;
+            s.async = true;
+            s.onload = () => resolve();
+            s.onerror = () => reject(new Error('Failed to load ' + url));
+            document.head.appendChild(s);
+        });
+
+        // Load both libs in parallel (marked first is fine)
+        const markedUrl = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
+        const dompurifyUrl = 'https://cdn.jsdelivr.net/npm/dompurify@2.4.0/dist/purify.min.js';
+
+        const promises = [];
+        if (!window.marked) promises.push(loadScript(markedUrl));
+        if (!window.DOMPurify) promises.push(loadScript(dompurifyUrl));
+
+        return Promise.all(promises);
     }
 
     addErrorMessage(error) {
@@ -141,8 +211,26 @@ class ChatApp {
     }
 
     async loadChatHistory() {
-        // Optional: Load previous messages from database
-        // This can be implemented if you want to persist chat history
+        // Load previous messages from database (if any) for the current session.
+        // This will request `api/chat_history.php` which returns the messages for the
+        // provided session_id (or the user's latest session if none provided).
+        try {
+            const resp = await fetch('api/chat_history.php?session_id=' + encodeURIComponent(this.sessionId), {
+                credentials: 'same-origin'
+            });
+            const data = await resp.json();
+            if (data && data.success && Array.isArray(data.messages) && data.messages.length > 0) {
+                // Clear current messages area and render the returned history
+                this.chatMessages.innerHTML = '';
+                for (const m of data.messages) {
+                    // m.role, m.message
+                    this.addMessage(m.role, m.message);
+                }
+            }
+        } catch (err) {
+            // Fail silently — history is optional
+            console.error('Failed to load chat history:', err);
+        }
     }
 
     escapeHtml(text) {
