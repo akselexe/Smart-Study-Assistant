@@ -31,7 +31,6 @@ try {
         exit;
     }
 
-    // Verify session belongs to this user
     $stmt = $db->prepare("SELECT user_id FROM chat_sessions WHERE session_id = ? LIMIT 1");
     $stmt->bind_param("s", $sessionId);
     $stmt->execute();

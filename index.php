@@ -4,8 +4,6 @@ require_once 'config/auth.php';
 $auth = new Auth();
 $auth->requireLogin();
 
-// Prevent professors from accessing the chat page directly.
-// Professors should use their dashboard instead.
 if ($auth->isProfessor()) {
     header('Location: professor/dashboard.php');
     exit;
