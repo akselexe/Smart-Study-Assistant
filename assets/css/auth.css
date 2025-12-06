@@ -175,7 +175,7 @@ body {
     text-decoration: underline;
 }
 
-/* Responsive Design */
+
 @media (max-width: 480px) {
     .auth-box {
         padding: 30px 20px;
